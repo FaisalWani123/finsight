@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
+import { Toaster } from "react-hot-toast";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -33,6 +34,16 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+        <Toaster 
+              position="bottom-right"
+              toastOptions={{
+                duration: 5000,
+                style: {
+                  background: '#363636',
+                  color: '#fff',
+                },
+              }}
+            />
           {children}
         </ThemeProvider>
       </body>
