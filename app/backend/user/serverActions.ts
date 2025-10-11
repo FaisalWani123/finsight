@@ -12,7 +12,7 @@ export async function getUserByIdFromServer(userId: string): Promise<BackendResp
         .single()
     
     if (error) {
-        return buildError<PublicSchemaUser>(error.message)
+        return buildError<PublicSchemaUser>("Could not find user")
     }
 
     return buildSuccess<PublicSchemaUser>("found user by id", data)

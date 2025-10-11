@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getAuthUser } from "../backend/redirects/checkUser"
 import { checkOnboarded } from "../backend/redirects/checkOnboarded";
 import OnboardingPageClient from "./onboarding/client";
+import MobileNav from "../blocks/nav/mobileNav";
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
 
@@ -19,6 +20,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
   
   return (
     <>
+      <MobileNav/>
         <main className="p-1 w-full">
             {children}
         </main>
