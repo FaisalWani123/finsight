@@ -2,6 +2,7 @@ import { BackendResponse } from "../types/General";
 import { OnBoardUserRequest, PublicSchemaUser } from "../types/User";
 import { buildError, buildSuccess } from "../build/general";
 import { createClient } from "@/lib/supabase/client";
+import { currencyMapper } from "@/lib/currencyMapper";
 
 export async function checkUsernameAvailabilityFromClient(username: string): Promise<BackendResponse<boolean>>{
     const supabase = await createClient();
@@ -57,4 +58,19 @@ export async function onboardUser(request: OnBoardUserRequest): Promise<BackendR
     if (error) return buildError("could not onboard user"); 
 
     return buildSuccess("User onboarded", data)
+}
+
+export async function updateCurrency(userId: string, currency: number): Promise<BackendResponse<PublicSchemaUser>>{
+    const supabase = await createClient(); 
+    console.log("user: ", userId, "currency: ", currency)
+    const {data, error} = await supabase
+        .from("user")
+        .update({currency: currency})
+        .eq("userId", userId)
+        .single<PublicSchemaUser>();
+    
+    if(error) {
+        return buildError("could not update currency")
+    }
+    return buildSuccess(`Currency is now ${currencyMapper(currency)}`, data);
 }

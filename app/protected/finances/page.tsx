@@ -14,7 +14,7 @@ export default async function FinancesPage() {
 
   return (
     <>
-        <FinancesClient userId={user.data?.userId} currency={user.data.currency}/>
+      <FinancesClient userId={user.data?.userId} currency={user.data.currency}/>
     </>
   )
 }

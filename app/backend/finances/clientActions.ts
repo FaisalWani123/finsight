@@ -1,30 +1,9 @@
 import { createClient } from "@/lib/supabase/client"; // adjust path as needed
+import { FinanceFormData, FinanceInsertRow, Finances } from "../types/Finances";
+import { BackendResponse } from "../types/General";
+import { buildError, buildSuccess } from "../build/general";
 
-type FinanceRow = {
-  label: string;
-  amount: number;
-};
 
-type FinanceFormData = {
-  inflows: FinanceRow[];
-  outflows: FinanceRow[];
-  assets: FinanceRow[];
-  liabilities: FinanceRow[];
-};
-
-type FinanceInsertRow = {
-  userId: string;
-  type: number;
-  label: string;
-  amount: number;
-  currency: number;
-};
-
-type BackendResponse<T> = {
-  success: boolean;
-  message: string;
-  data?: T;
-};
 
 // Map each section to its corresponding type value
 const FINANCE_TYPE_MAP = {
@@ -34,13 +13,7 @@ const FINANCE_TYPE_MAP = {
   liabilities: 4,
 } as const;
 
-function buildSuccess<T>(message: string, data?: T): BackendResponse<T> {
-  return { success: true, message, data };
-}
 
-function buildError<T>(message: string): BackendResponse<T> {
-  return { success: false, message };
-}
 
 export async function insertFinancesFromFormFromClient(userId: string, formData: FinanceFormData, currency: number): Promise<BackendResponse<FinanceInsertRow[]>> {
   const supabase = await createClient();
@@ -81,4 +54,20 @@ export async function insertFinancesFromFormFromClient(userId: string, formData:
     `Successfully inserted ${data.length} finance entries`,
     data
   );
+}
+
+export async function fetchUserFinances(userId: string): Promise<BackendResponse<Finances[]>> {
+  const supabase = await createClient();
+  console.log("userId:", userId)
+  const { data, error } = await supabase
+    .from("finances")
+    .select("*")
+    .eq("userId", userId)
+    .order("createdAt", { ascending: false });
+
+  if (!data || error) {
+    return buildError("could not fetch finances");
+  }
+
+  return buildSuccess("Fetched Finances", data)
 }

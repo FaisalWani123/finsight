@@ -1,10 +1,12 @@
 "use client";
 
 import { PublicSchemaUser } from "@/app/backend/types/User"; // adjust path
+import { updateCurrency } from "@/app/backend/user/clientActions";
 import { CurrencyDropdown } from "@/app/blocks/forms/currencyDropdown";
 import { LogoutButton } from "@/components/logout-button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Item, ItemHeader, ItemContent, ItemTitle } from "@/components/ui/item";
+import { toastCenter } from "@/lib/toastCenter";
 
 type ProfilePageProps = {
   user: PublicSchemaUser;
@@ -13,7 +15,8 @@ type ProfilePageProps = {
 export default function ProfileClient({ user }: ProfilePageProps) {
 
   const handleUpdateCurerncy = async (newCurrency: number) => {
-
+    const response = await updateCurrency(user.userId, newCurrency)
+    toastCenter(response)
   }
   
   return (

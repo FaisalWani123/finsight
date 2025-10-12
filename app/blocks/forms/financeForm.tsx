@@ -13,18 +13,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Plus, X } from "lucide-react";
+import { FinanceFormData } from "@/app/backend/types/Finances";
 
-type FinanceRow = {
-  label: string;
-  amount: number;
-};
-
-export type FinanceFormData = {
-  inflows: FinanceRow[];
-  outflows: FinanceRow[];
-  assets: FinanceRow[];
-  liabilities: FinanceRow[];
-};
 
 interface FinanceFormProps {
   onSubmit: (data: FinanceFormData) => void;
@@ -66,31 +56,46 @@ export const FinanceForm: React.FC<FinanceFormProps> = ({ onSubmit }) => {
             <CardContent className="space-y-4">
               {fields.map((field, index) => (
                 <FieldGroup key={field.id} className="flex gap-3 items-end">
+                  {/* Label Input */}
                   <Field className="flex-1">
-                    <FieldLabel htmlFor={`${section}-${index}-label`}>
-                      Label
-                    </FieldLabel>
+                    <FieldLabel htmlFor={`${section}-${index}-label`}>Label</FieldLabel>
                     <Input
                       id={`${section}-${index}-label`}
                       {...register(`${section}.${index}.label` as const, { required: true })}
                       placeholder="Enter label"
                     />
                   </Field>
+
+                  {/* Amount Input */}
                   <Field className="flex-1">
-                    <FieldLabel htmlFor={`${section}-${index}-amount`}>
-                      Amount
-                    </FieldLabel>
+                    <FieldLabel htmlFor={`${section}-${index}-amount`}>Amount</FieldLabel>
                     <Input
                       id={`${section}-${index}-amount`}
-                      type="number"
-                      step="0.01"
+                      type="text"
                       {...register(`${section}.${index}.amount` as const, {
                         required: true,
                         valueAsNumber: true,
                       })}
                       placeholder="0.00"
+                      onFocus={(e) => {
+                        // Remove formatting when editing
+                        const val = e.target.value.replace(/[^0-9.-]+/g, "");
+                        e.target.value = val;
+                      }}
+                      onBlur={(e) => {
+                        // Format as currency on blur
+                        const val = Number(e.target.value);
+                        if (!isNaN(val)) {
+                          e.target.value = new Intl.NumberFormat("en-US", {
+                            style: "currency",
+                            currency: "USD", // replace with dynamic currency if needed
+                          }).format(val);
+                        }
+                      }}
                     />
                   </Field>
+
+                  {/* Remove Button */}
                   <Button
                     type="button"
                     variant="ghost"
@@ -102,6 +107,7 @@ export const FinanceForm: React.FC<FinanceFormProps> = ({ onSubmit }) => {
                 </FieldGroup>
               ))}
 
+              {/* Add Button */}
               <Button
                 type="button"
                 variant="outline"
@@ -110,19 +116,19 @@ export const FinanceForm: React.FC<FinanceFormProps> = ({ onSubmit }) => {
                 className="w-full"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add {section}
+                Add {sectionConfig[section].title}
               </Button>
             </CardContent>
           </Card>
         );
       })}
 
-        <div className="flex justify-center mt-6">
-            <Button type="submit" className="w-full/2">
-                 Submit
-            </Button>
-        </div>
-      
+      {/* Submit Button */}
+      <div className="flex justify-center mt-6">
+        <Button type="submit" className="w-full/2">
+          Submit
+        </Button>
+      </div>
     </form>
   );
 };

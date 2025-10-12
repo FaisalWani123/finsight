@@ -1,7 +1,15 @@
+import Dashboard from '@/app/blocks/dashboard'
 import React from 'react'
 
-export default function HomeClient() {
+interface HomeClientProps {
+  userId: string;
+  profileCurrency: number;
+}
+
+export default function HomeClient({userId, profileCurrency}: HomeClientProps) {
   return (
-    <div>HomeClient</div>
+    <>
+      <Dashboard userId={userId} profileCurrency={profileCurrency}/>
+    </>
   )
 }
