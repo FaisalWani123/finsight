@@ -8,6 +8,8 @@ export type PublicSchemaUser = {
   createdAt: Date;
   updatedAt?: Date | null;
   isMale: boolean;
+  email: string;
+  currency: number;
 };
 
 export type OnBoardUserRequest = {
@@ -18,4 +20,5 @@ export type OnBoardUserRequest = {
   username: string
   age: number
   isMale: boolean
+  currency: number
 }

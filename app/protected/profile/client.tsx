@@ -1,14 +1,21 @@
 "use client";
 
 import { PublicSchemaUser } from "@/app/backend/types/User"; // adjust path
+import { CurrencyDropdown } from "@/app/blocks/forms/currencyDropdown";
+import { LogoutButton } from "@/components/logout-button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Item, ItemHeader, ItemContent, ItemTitle, ItemDescription } from "@/components/ui/item";
+import { Item, ItemHeader, ItemContent, ItemTitle } from "@/components/ui/item";
 
 type ProfilePageProps = {
   user: PublicSchemaUser;
 };
 
 export default function ProfileClient({ user }: ProfilePageProps) {
+
+  const handleUpdateCurerncy = async (newCurrency: number) => {
+
+  }
+  
   return (
     <div className="flex justify-center p-4">
       <Card className="w-full max-w-3xl shadow-md rounded-2xl">
@@ -20,17 +27,30 @@ export default function ProfileClient({ user }: ProfilePageProps) {
 
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Item size={"sm"} variant={"muted"}>
-              <ItemHeader>User ID</ItemHeader>
+            <Item size="sm" variant="muted">
+              <ItemHeader>Currency</ItemHeader>
               <ItemContent>
-                <ItemTitle>{user.userId}</ItemTitle>
+                <CurrencyDropdown
+                  initialCurrencyId={user.currency}
+                  onCurrencyChange={(newCurrency) => {
+                    handleUpdateCurerncy(newCurrency)
+                  }}
+                />
               </ItemContent>
             </Item>
+
 
             <Item size={"sm"} variant={"muted"}>
               <ItemHeader>Username</ItemHeader>
               <ItemContent>
                 <ItemTitle>{user.username}</ItemTitle>
+              </ItemContent>
+            </Item>
+
+            <Item size={"sm"} variant={"muted"}>
+              <ItemHeader>Email</ItemHeader>
+              <ItemContent>
+                <ItemTitle>{user.email}</ItemTitle>
               </ItemContent>
             </Item>
 
@@ -61,6 +81,9 @@ export default function ProfileClient({ user }: ProfilePageProps) {
                 <ItemTitle>{new Date(user.createdAt).toDateString()}</ItemTitle>
               </ItemContent>
             </Item>
+          </div>
+          <div className="flex justify-center mt-4">
+            <LogoutButton/>
           </div>
         </CardContent>
       </Card>

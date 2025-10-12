@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Field, FieldLabel, FieldGroup } from "@/components/ui/field";
@@ -17,7 +19,7 @@ type FinanceRow = {
   amount: number;
 };
 
-type FinanceFormData = {
+export type FinanceFormData = {
   inflows: FinanceRow[];
   outflows: FinanceRow[];
   assets: FinanceRow[];

@@ -37,6 +37,8 @@ export default function OnboardingPageClient({ userId, email }: OnboardingPagePr
   const [age, setAge] = useState<number>(0);
   const [gender, setGender] = useState<"male" | "female">("male");
   const [showCelebration, setShowCelebration] = useState(false);
+  const [currency, setCurrency] = useState<"1" | "2" | "3">("1");
+
 
 
   // Errors
@@ -156,6 +158,25 @@ export default function OnboardingPageClient({ userId, email }: OnboardingPagePr
         </>
       ),
     },
+    {
+      label: "Currency",
+      render: () => (
+        <>
+          <Label>Preferred Currency</Label>
+          <Select value={currency} onValueChange={(val: "1" | "2" | "3") => setCurrency(val)}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select your currency" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">USD — US Dollar</SelectItem>
+              <SelectItem value="2">EUR — Euro</SelectItem>
+              <SelectItem value="3">HUF — Hungarian Forint</SelectItem>
+            </SelectContent>
+          </Select>
+        </>
+      ),
+    },
+
   ];
 
   // Next/Back
@@ -206,10 +227,10 @@ export default function OnboardingPageClient({ userId, email }: OnboardingPagePr
       username: username,
       age: age,
       isMale: gender === "male",
+      currency: Number(currency)
     }
     const onboardUserResponse = await onboardUser(onboardUserRequest)
     if (!onboardUserResponse.success) {
-        console.log("onboardUser Response: ", onboardUserResponse.success)
       return toast("Error completing profile, please try again later"); 
     } 
 

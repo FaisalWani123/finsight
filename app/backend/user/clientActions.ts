@@ -49,6 +49,7 @@ export async function onboardUser(request: OnBoardUserRequest): Promise<BackendR
             username: request.username,
             age: request.age,
             isMale: request.isMale,
+            currency: request.currency
         })
         .select("*")
         .single<PublicSchemaUser>();
