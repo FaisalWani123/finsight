@@ -2,7 +2,9 @@ import { createClient } from "@/lib/supabase/client"; // adjust path as needed
 import { FinanceFormData, FinanceInsertRow, Finances } from "../types/Finances";
 import { BackendResponse } from "../types/General";
 import { buildError, buildSuccess } from "../build/general";
-
+import { convertCurrency } from "@/lib/currencyConverter";
+import { currencyMapper } from "@/lib/currencyMapper";
+import { ClassStatisticRepsonse } from "../types/Finances";
 
 
 // Map each section to its corresponding type value
@@ -97,4 +99,89 @@ export async function updateFinanceEntryById(id: string, label: string, amount: 
     return buildError("Could not update")
   }
   return buildSuccess("Updated Successfully", data)
+}
+
+export function collateTotal(data: Finances[], targetCurrency: number): number {
+    const total = data.reduce((acc, record) => {
+        const amount = Number(record.amount);
+        const fromCurrency = currencyMapper(Number(record.currency));
+        const converted = convertCurrency(amount, fromCurrency, currencyMapper(targetCurrency));
+        return acc + converted;
+    }, 0);
+    return total;
+}
+
+export async function getTotalInflowFromClient(userId: string, targetCurrency: number): Promise<BackendResponse<ClassStatisticRepsonse>> {
+    const supabase = await createClient(); 
+    const {data, error} = await supabase
+        .from("finances")
+        .select("*")
+        .eq("userId", userId)
+        .eq("type", 1)
+
+    if (error) throw error;
+    const records: Finances[] = data;
+    if (!records || records.length === 0) {
+      return buildError("could not fetch total inflows");
+    }
+
+    const total = collateTotal(records, targetCurrency)
+    return buildSuccess("", {records, total})
+}
+
+export async function getTotalOutflowFromClient(userId: string, targetCurrency: number): Promise<BackendResponse<ClassStatisticRepsonse>> {
+    const supabase = await createClient(); 
+    const {data, error} = await supabase
+        .from("finances")
+        .select("*")
+        .eq("userId", userId)
+        .eq("type", 2)
+
+    if (error) throw error;
+    const records: Finances[] = data;
+
+    if (!records || records.length === 0) {
+      return buildError("could not fetch total outflows");
+    }
+
+    const total = collateTotal(records, targetCurrency)
+    return buildSuccess("", {records, total})
+
+}
+
+export async function getTotalAssetsFromClient(userId: string, targetCurrency: number): Promise<BackendResponse<ClassStatisticRepsonse>> {
+    const supabase = await createClient(); 
+    const {data, error} = await supabase
+        .from("finances")
+        .select("*")
+        .eq("userId", userId)
+        .eq("type", 3)
+        
+    if (error) throw error;
+    const records: Finances[] = data;
+    if (!records || records.length === 0) {
+      return buildError("could not fetch total assets");
+    }
+    const total = collateTotal(records, targetCurrency)
+    return buildSuccess("", {records, total})
+
+}
+
+export async function getLiabilitiesFromClient(userId: string, targetCurrency: number): Promise<BackendResponse<ClassStatisticRepsonse>> {
+    const supabase = await createClient(); 
+    const {data, error} = await supabase
+        .from("finances")
+        .select("*")
+        .eq("userId", userId)
+        .eq("type", 4)
+
+    if (error) throw error;
+    const records: Finances[] = data;
+
+    if (!records || records.length === 0) {
+      return buildError("could not fetch total liabilities");
+    }
+
+    const total = collateTotal(records, targetCurrency)
+    return buildSuccess("", {records, total})
 }

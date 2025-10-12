@@ -5,13 +5,6 @@ const conversionRates: Record<string, Record<string, number>> = {
   HUF: { USD: 0.0028, EUR: 0.00255, HUF: 1 },
 };
 
-/**
- * Convert an amount from one currency to another
- * @param amount number - the original amount
- * @param from string - currency code of original amount
- * @param to string - currency code to convert to
- * @returns number - converted amount
- */
 export function convertCurrency(amount: number, from: string, to: string) {
   if (from === to) return amount;
 
