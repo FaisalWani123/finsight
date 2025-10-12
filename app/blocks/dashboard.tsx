@@ -3,11 +3,14 @@
 import React, { useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { Finances } from "../backend/types/Finances";
-import { fetchUserFinances, deleteFinanceEntryById } from "../backend/finances/clientActions";
+import { fetchUserFinances, deleteFinanceEntryById, updateFinanceEntryById } from "../backend/finances/clientActions";
 import { currencyMapper } from "@/lib/currencyMapper";
 import { FinanceCard } from "./homeCard";
 import { toastCenter } from "@/lib/toastCenter";
 import { createClient } from "@/lib/supabase/client";
+import { Empty, EmptyDescription, EmptyTitle } from "@/components/ui/empty"; // Shadcn Empty component
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface DashboardProps {
   userId: string;
@@ -16,6 +19,7 @@ interface DashboardProps {
 
 export default function Dashboard({ userId, profileCurrency }: DashboardProps) {
   const supabase = createClient();
+  const router = useRouter();
   const [finances, setFinances] = useState<Finances[]>([]);
   const [loading, setLoading] = useState(true);
   const profileCurrencyCode = currencyMapper(profileCurrency);
@@ -31,14 +35,14 @@ export default function Dashboard({ userId, profileCurrency }: DashboardProps) {
   useEffect(() => {
     loadFinances();
 
-    // Create a Realtime channel for finances
+    // Realtime subscription
     const financeChannel = supabase
       .channel("finance-changes")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "finances", filter: `userId=eq.${userId}` },
         () => {
-          loadFinances(); // refetch on any INSERT/UPDATE/DELETE
+          loadFinances(); // refetch on any change
         }
       )
       .subscribe();
@@ -52,19 +56,30 @@ export default function Dashboard({ userId, profileCurrency }: DashboardProps) {
 
   const filterByType = (type: number) => finances.filter(f => f.type === type);
 
-  const handleEditFinance = (id: string, label: string, amount: number) => {
-    console.log("Edit Finance:", { id, label, amount });
+  const handleEditFinance = async (id: string, label: string, amount: number) => {
+    const response = await updateFinanceEntryById(id, label, amount);
+    toastCenter(response);
+    loadFinances();
   };
 
   const handleDeleteFinance = async (id: string) => {
     const response = await deleteFinanceEntryById(id);
     toastCenter(response);
-    if (response.success) loadFinances(); // reload to keep data fresh
+    loadFinances();
   };
 
   const renderSection = (title: string, type: number) => {
     const items = filterByType(type);
-    if (!items.length) return null;
+
+    if (!items.length)
+      return (
+        <Empty className="my-6">
+          <EmptyTitle>No {title} yet</EmptyTitle>
+          <EmptyDescription>
+            <Button onClick={() => router.push("/protected/finances")}> Add {title}</Button>
+          </EmptyDescription>
+        </Empty>
+      );
 
     return (
       <div className="space-y-2">

@@ -84,3 +84,17 @@ export async function deleteFinanceEntryById(id: string): Promise<BackendRespons
   }
   return buildSuccess("Successfully deleted", true)
 }
+
+export async function updateFinanceEntryById(id: string, label: string, amount: number): Promise<BackendResponse<Finances>> {
+  const supabase = await createClient(); 
+  const {data, error} = await supabase
+    .from("finances")
+    .update({label: label, amount: amount})
+    .eq("id", id)
+    .single<Finances>();
+
+  if (error) {
+    return buildError("Could not update")
+  }
+  return buildSuccess("Updated Successfully", data)
+}
