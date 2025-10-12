@@ -3,9 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { Finances } from "../backend/types/Finances";
-import { fetchUserFinances } from "../backend/finances/clientActions";
+import { fetchUserFinances, deleteFinanceEntryById } from "../backend/finances/clientActions";
 import { currencyMapper } from "@/lib/currencyMapper";
 import { FinanceCard } from "./homeCard";
+import { toastCenter } from "@/lib/toastCenter";
+import { createClient } from "@/lib/supabase/client";
 
 interface DashboardProps {
   userId: string;
@@ -13,40 +15,56 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ userId, profileCurrency }: DashboardProps) {
+  const supabase = createClient();
   const [finances, setFinances] = useState<Finances[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Map numeric currency to string
   const profileCurrencyCode = currencyMapper(profileCurrency);
 
+  // Fetch fresh data
+  const loadFinances = async () => {
+    setLoading(true);
+    const res = await fetchUserFinances(userId);
+    if (res.success && res.data) setFinances(res.data);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    async function loadFinances() {
-      setLoading(true);
-      const res = await fetchUserFinances(userId);
-      if (res.success && res.data) setFinances(res.data);
-      setLoading(false);
-    }
     loadFinances();
+
+    // Create a Realtime channel for finances
+    const financeChannel = supabase
+      .channel("finance-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "finances", filter: `userId=eq.${userId}` },
+        () => {
+          loadFinances(); // refetch on any INSERT/UPDATE/DELETE
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(financeChannel);
+    };
   }, [userId]);
 
   if (loading) return <Spinner className="mx-auto mt-20" />;
 
   const filterByType = (type: number) => finances.filter(f => f.type === type);
 
-  // Example functions to pass to the card/modal
   const handleEditFinance = (id: string, label: string, amount: number) => {
-    console.log("Edit", { id, label, amount });
-    // Update logic here
+    console.log("Edit Finance:", { id, label, amount });
   };
 
-  const handleDeleteFinance = (id: string) => {
-    console.log("Delete", id);
-    // Delete logic here
+  const handleDeleteFinance = async (id: string) => {
+    const response = await deleteFinanceEntryById(id);
+    toastCenter(response);
+    if (response.success) loadFinances(); // reload to keep data fresh
   };
 
   const renderSection = (title: string, type: number) => {
     const items = filterByType(type);
-    if (items.length === 0) return null;
+    if (!items.length) return null;
 
     return (
       <div className="space-y-2">

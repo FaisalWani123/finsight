@@ -71,3 +71,16 @@ export async function fetchUserFinances(userId: string): Promise<BackendResponse
 
   return buildSuccess("Fetched Finances", data)
 }
+
+export async function deleteFinanceEntryById(id: string): Promise<BackendResponse<Boolean>> {
+  const supabase = await createClient(); 
+  const {error} = await supabase
+    .from("finances")
+    .delete()
+    .eq("id", id)
+
+  if (error) {
+    return buildError("Could not delete entry")
+  }
+  return buildSuccess("Successfully deleted", true)
+}

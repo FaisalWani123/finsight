@@ -58,7 +58,7 @@ export const FinanceModal: React.FC<FinanceModalProps> = ({
           />
         </div>
         <DialogFooter className="flex justify-between mt-4">
-          <Button variant="destructive" onClick={() => onDelete(finance.id)}>
+          <Button variant="destructive" onClick={() => {onDelete(finance.id); setOpen(false)}}>
             Delete
           </Button>
           <Button
