@@ -22,11 +22,11 @@ interface RatioCardProps {
   color?: string;
 }
 
-function RatioCard({ title, value, subtitle, color = "bg-white" }: RatioCardProps) {
+function RatioCard({ title, value, subtitle, color = "bg-white dark: bg-white" }: RatioCardProps) {
   return (
     <div className={`shadow-lg rounded-xl p-6 flex flex-col justify-between ${color}`}>
       <h3 className="text-gray-600 text-sm">{title}</h3>
-      <p className="text-2xl font-bold mt-2">{value}</p>
+      <p className="text-2xl font-bold mt-2 dark:text-black">{value}</p>
       {subtitle && <p className="text-gray-400 text-xs mt-1">{subtitle}</p>}
     </div>
   );
