@@ -23,7 +23,6 @@ interface FinanceModalProps {
 
 export const FinanceModal: React.FC<FinanceModalProps> = ({
   finance,
-  profileCurrencyCode,
   onEdit,
   onDelete,
   children,

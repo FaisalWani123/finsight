@@ -1,5 +1,4 @@
 "use client"
-
 import Dashboard from '@/app/blocks/dashboard';
 import Ratios from '@/app/blocks/ratios';
 import React, { useEffect, useState } from 'react';
@@ -7,25 +6,24 @@ import { Finances } from '@/app/backend/types/Finances';
 import { BackendResponse } from '@/app/backend/types/General';
 import { ClassStatisticRepsonse } from '@/app/backend/types/Finances';
 import { getLiabilitiesFromClient, getTotalAssetsFromClient, getTotalInflowFromClient, getTotalOutflowFromClient } from '@/app/backend/finances/clientActions';
+import { InsightResponse } from '@/app/backend/types/Insight';
+import { InsightCardsGroup } from '@/app/blocks/insights/InsightCard';
 
 interface HomeClientProps {
   userId: string;
   profileCurrency: number;
+  insights: InsightResponse[];
 }
 
-export default function HomeClient({ userId, profileCurrency }: HomeClientProps) {
+export default function HomeClient({ userId, profileCurrency, insights }: HomeClientProps) {
   const [inflows, setInflows] = useState<Finances[]>([]);
   const [inflowTotal, setInflowTotal] = useState(0);
-
   const [outflows, setOutflows] = useState<Finances[]>([]);
   const [outflowTotal, setOutflowTotal] = useState(0);
-
   const [assets, setAssets] = useState<Finances[]>([]);
   const [assetsTotal, setAssetsTotal] = useState(0);
-
   const [liabilities, setLiabilities] = useState<Finances[]>([]);
   const [liabilitiesTotal, setLiabilitiesTotal] = useState(0);
-
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -75,8 +73,11 @@ export default function HomeClient({ userId, profileCurrency }: HomeClientProps)
         assetsTotal={assetsTotal}
         assets={assets}
         liabilitiesTotal={liabilitiesTotal}
-        liabilities={liabilities} profileCurrency={profileCurrency}      />
+        liabilities={liabilities}
+        profileCurrency={profileCurrency}
+      />
       <Dashboard userId={userId} profileCurrency={profileCurrency} />
+      <InsightCardsGroup insights={insights} />
     </div>
   );
 }

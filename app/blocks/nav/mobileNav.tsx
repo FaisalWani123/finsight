@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { ThemeSwitcher } from '@/components/theme-switcher';
-import { Home, Inbox, LayoutDashboard, User, } from 'lucide-react';
+import { Home, LayoutDashboard, User, } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 

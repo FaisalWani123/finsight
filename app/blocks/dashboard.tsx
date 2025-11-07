@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { Finances } from "../backend/types/Finances";
 import { fetchUserFinances, deleteFinanceEntryById, updateFinanceEntryById } from "../backend/finances/clientActions";
@@ -25,12 +25,12 @@ export default function Dashboard({ userId, profileCurrency }: DashboardProps) {
   const profileCurrencyCode = currencyMapper(profileCurrency);
 
   // Fetch fresh data
-  const loadFinances = async () => {
+  const loadFinances = useCallback(async () => {
     setLoading(true);
     const res = await fetchUserFinances(userId);
     if (res.success && res.data) setFinances(res.data);
     setLoading(false);
-  };
+  }, [userId]);
 
   useEffect(() => {
     loadFinances();
@@ -50,7 +50,7 @@ export default function Dashboard({ userId, profileCurrency }: DashboardProps) {
     return () => {
       supabase.removeChannel(financeChannel);
     };
-  }, [userId]);
+  }, [loadFinances, supabase, userId]);
 
   if (loading) return <Spinner className="mx-auto mt-20" />;
 
@@ -101,8 +101,8 @@ export default function Dashboard({ userId, profileCurrency }: DashboardProps) {
 
   return (
     <div className="p-6 space-y-8">
-      {renderSection("Assets", 4)}
-      {renderSection("Liabilities", 3)}
+      {renderSection("Assets", 3)}
+      {renderSection("Liabilities", 4)}
       {renderSection("Inflows", 1)}
       {renderSection("Outflows", 2)}
     </div>

@@ -15,8 +15,6 @@ const FINANCE_TYPE_MAP = {
   liabilities: 4,
 } as const;
 
-
-
 export async function insertFinancesFromFormFromClient(userId: string, formData: FinanceFormData, currency: number): Promise<BackendResponse<FinanceInsertRow[]>> {
   const supabase = await createClient();
   // Transform nested form data into flat array of rows
@@ -74,7 +72,7 @@ export async function fetchUserFinances(userId: string): Promise<BackendResponse
   return buildSuccess("Fetched Finances", data)
 }
 
-export async function deleteFinanceEntryById(id: string): Promise<BackendResponse<Boolean>> {
+export async function deleteFinanceEntryById(id: string): Promise<BackendResponse<boolean>> {
   const supabase = await createClient(); 
   const {error} = await supabase
     .from("finances")

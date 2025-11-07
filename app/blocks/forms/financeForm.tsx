@@ -37,15 +37,19 @@ export const FinanceForm: React.FC<FinanceFormProps> = ({ onSubmit }) => {
     },
   });
 
+  const flows = {
+    inflows: useFieldArray({ control, name: "inflows" }),
+    outflows: useFieldArray({ control, name: "outflows" }),
+    assets: useFieldArray({ control, name: "assets" }),
+    liabilities: useFieldArray({ control, name: "liabilities" }),
+  };
+
   const sections: (keyof FinanceFormData)[] = ["inflows", "outflows", "assets", "liabilities"];
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mb-8">
       {sections.map((section) => {
-        const { fields, append, remove } = useFieldArray({
-          control,
-          name: section,
-        });
+        const { fields, append, remove } = flows[section];
 
         return (
           <Card key={section}>
@@ -78,17 +82,15 @@ export const FinanceForm: React.FC<FinanceFormProps> = ({ onSubmit }) => {
                       })}
                       placeholder="0.00"
                       onFocus={(e) => {
-                        // Remove formatting when editing
                         const val = e.target.value.replace(/[^0-9.-]+/g, "");
                         e.target.value = val;
                       }}
                       onBlur={(e) => {
-                        // Format as currency on blur
                         const val = Number(e.target.value);
                         if (!isNaN(val)) {
                           e.target.value = new Intl.NumberFormat("en-US", {
                             style: "currency",
-                            currency: "USD", // replace with dynamic currency if needed
+                            currency: "USD",
                           }).format(val);
                         }
                       }}
@@ -132,3 +134,4 @@ export const FinanceForm: React.FC<FinanceFormProps> = ({ onSubmit }) => {
     </form>
   );
 };
+
